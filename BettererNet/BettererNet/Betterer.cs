@@ -1,6 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -15,13 +13,14 @@ namespace BettererNet
 
         public Betterer([CallerMemberName] string methodName = "")
         {
+            var separator = Path.DirectorySeparatorChar;
             var directory =
-                $"{Directory.GetParent(Directory.GetCurrentDirectory())!.Parent!.FullName.Split("\\bin")[0]}\\BettererResults";
+                $"{Directory.GetParent(Directory.GetCurrentDirectory())!.Parent!.FullName.Split($"{separator}bin")[0]}{separator}BettererResults";
             _fullPath = Path.Combine(directory, $"{methodName}.json");
 
             if (!Directory.Exists(directory))
             {
-                throw new InvalidOperationException("Unable to file NetArch result directory");
+                Directory.CreateDirectory(directory);
             }
         }
 
@@ -41,14 +40,14 @@ namespace BettererNet
                 {
                     Assert.Empty(testResult.FailingTypeNames);
                 }
-                
+
                 await SaveResultAsync(testResult);
                 return;
             }
 
             var newFails = testResult.FailingTypeNames.Where(n => !result.FailingTypeNames.Contains(n)).ToList();
             Assert.Empty(newFails);
-            
+
             await SaveResultAsync(testResult);
         }
 
