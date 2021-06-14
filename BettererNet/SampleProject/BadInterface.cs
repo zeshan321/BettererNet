@@ -1,11 +1,11 @@
 ﻿namespace SampleProject
 {
-    public interface IBadInterface
+    public interface BadInterface
     {
         
     }
     
-    public interface IBadInterfaceC
+    public interface BadInterfaceC
     {
         
     }

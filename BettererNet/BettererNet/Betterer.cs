@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace BettererNet
 {
@@ -26,7 +27,8 @@ namespace BettererNet
 
         public async Task AssertAsync(BettererResult testResult, bool allowFirstFailure = false)
         {
-            if (testResult.IsSuccessful)
+            var isSuccessful = !testResult.FailingTypeNames.Any();
+            if (isSuccessful)
             {
                 File.Delete(_fullPath);
                 return;
@@ -37,7 +39,7 @@ namespace BettererNet
             {
                 if (!allowFirstFailure)
                 {
-                    throw new ValidationException("Test result was unsuccessful");
+                    Assert.Empty(testResult.FailingTypeNames);
                 }
                 
                 await SaveResultAsync(testResult);
@@ -45,10 +47,7 @@ namespace BettererNet
             }
 
             var newFails = testResult.FailingTypeNames.Where(n => !result.FailingTypeNames.Contains(n)).ToList();
-            if (newFails.Any())
-            {
-                throw new ValidationException($"New failing types found {string.Join(',', newFails)}");
-            }
+            Assert.Empty(newFails);
             
             await SaveResultAsync(testResult);
         }

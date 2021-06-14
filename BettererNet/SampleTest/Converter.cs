@@ -7,11 +7,10 @@ namespace SampleTest
     {
         public static BettererResult ToBetterer(this TestResult testResult)
         {
-            return new BettererResult
-            {
-                IsSuccessful = testResult.IsSuccessful,
-                FailingTypeNames = testResult.FailingTypeNames
-            };
+            var result = new BettererResult();
+            result.FailingTypeNames.AddRange(testResult.FailingTypeNames);
+
+            return result;
         }
     }
 }
