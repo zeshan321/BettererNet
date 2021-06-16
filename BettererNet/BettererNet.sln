@@ -6,6 +6,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleProject", "SampleProj
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BettererNet", "BettererNet\BettererNet.csproj", "{B0E61929-9840-4697-86B5-8A67E5CB4FB4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InspectCodeSnapshot", "InspectCodeSnapshot\InspectCodeSnapshot.csproj", "{2AF234F3-0B95-4C1A-A3AD-7CE39BAF7D1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{B0E61929-9840-4697-86B5-8A67E5CB4FB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0E61929-9840-4697-86B5-8A67E5CB4FB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0E61929-9840-4697-86B5-8A67E5CB4FB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AF234F3-0B95-4C1A-A3AD-7CE39BAF7D1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AF234F3-0B95-4C1A-A3AD-7CE39BAF7D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AF234F3-0B95-4C1A-A3AD-7CE39BAF7D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AF234F3-0B95-4C1A-A3AD-7CE39BAF7D1D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
