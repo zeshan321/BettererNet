@@ -49,36 +49,54 @@ namespace InspectCodeSnapshot
             {
                 foreach (var project in compareResult.Issues.Project)
                 {
-                    var projectIssues = project.Issues.Where(i => i.TypeId == violation).ToList();
-                    if (!projectIssues.Any())
-                    {
-                        continue;
-                    }
-
                     var snapshotProject = snapshotResult.Issues.Project.SingleOrDefault(p => p.Name == project.Name);
                     if (snapshotProject == null)
                     {
-                        Console.WriteLine($"{project.Name} - New project with violations found:");
-                        foreach (var projectIssue in projectIssues)
+                        Console.WriteLine($"{project.Name} - violations found in new project:");
+                        var items = project.Issues.Where(i => i.TypeId == violation).ToList();
+                        foreach (var issue in items)
                         {
-                            issues.Add(projectIssue);
-                            Console.WriteLine(projectIssue);
+                            Console.WriteLine(issue);
                         }
+
+                        issues.AddRange(items);
+                        continue;
                     }
-                    else
+
+                    var projectIssues = project.Issues.Where(i => i.TypeId == violation).ToLookup(i => i.File);
+                    var snapshotIssues = snapshotProject.Issues.Where(i => i.TypeId == violation).ToLookup(i => i.File);
+
+                    foreach (var file in projectIssues)
                     {
-                        var snapshotIssues = snapshotProject.Issues.Where(i => i.TypeId == violation);
-                        if (projectIssues.Count <= snapshotIssues.Count())
+                        if (!snapshotIssues.Contains(file.Key))
+                        {
+                            Console.WriteLine($"{project.Name}/{file.Key} - violations found in new file:");
+                            var items = project.Issues.Where(i => i.TypeId == violation && i.File == file.Key).ToList();
+                            foreach (var issue in items)
+                            {
+                                Console.WriteLine(issue);
+                            }
+
+                            issues.AddRange(items);
+                            continue;
+                        }
+
+                        var projectFileIssues = projectIssues[file.Key].Count();
+                        var snapshotFileIssues = snapshotIssues[file.Key].Count();
+
+                        if (projectFileIssues <= snapshotFileIssues)
                         {
                             continue;
                         }
 
-                        Console.WriteLine($"{project.Name} - New violations found:");
-                        foreach (var projectIssue in projectIssues)
+                        Console.WriteLine($"{project.Name}/{file.Key} - violations found in existing file:");
+                        var allIssues = project.Issues.Where(i => i.TypeId == violation && i.File == file.Key).ToList();
+                        foreach (var issue in allIssues)
                         {
-                            issues.Add(projectIssue);
-                            Console.WriteLine(projectIssue);
+                            Console.WriteLine(issue);
                         }
+
+                        issues.AddRange(allIssues);
                     }
                 }
             }
@@ -104,8 +122,11 @@ namespace InspectCodeSnapshot
             return snapshot;
         }
 
-        private static Task GenerateFile(ProcessStartInfo processStartInfo)
+        private static async Task GenerateFile(ProcessStartInfo processStartInfo)
         {
+            var watch = new Stopwatch();
+
+            watch.Start();
             var process = new Process
             {
                 StartInfo = processStartInfo
@@ -113,18 +134,18 @@ namespace InspectCodeSnapshot
 
             process.Start();
 
-            if (!_settings.Debug)
+            if (_settings.Debug)
             {
-                return process.WaitForExitAsync();
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    var line = await process.StandardOutput.ReadLineAsync();
+                    Console.WriteLine(line);
+                }
             }
 
-            while (!process.StandardOutput.EndOfStream)
-            {
-                var line = process.StandardOutput.ReadLine();
-                Console.WriteLine(line);
-            }
-
-            return process.WaitForExitAsync();
+            await process.WaitForExitAsync();
+            watch.Start();
+            Console.WriteLine($"Generation Time: {watch.ElapsedMilliseconds} ms");
         }
     }
 }
